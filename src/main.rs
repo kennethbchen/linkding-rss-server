@@ -1,5 +1,7 @@
 use config::Config;
 
+use linkding::{LinkDingClient, LinkDingError, ListBookmarksArgs};
+
 struct AppConfig {
     api_key: String,
     url: String,
@@ -29,7 +31,22 @@ fn parse_config() -> AppConfig {
 fn main() {
     let cfg: AppConfig = parse_config();
 
-    println!("{}", cfg.api_key);
+    let client: LinkDingClient = LinkDingClient::new(&cfg.url, &cfg.api_key);
 
-    println!("{}", cfg.url);
+    let args: ListBookmarksArgs = ListBookmarksArgs {
+        query: None,
+        limit: None,
+        offset: None,
+    };
+
+    let response = client.list_bookmarks(args);
+
+    match response {
+        Ok(res) => {
+            println!("{}", res.count);
+        }
+        Err(e) => {
+            println!("{}", e);
+        }
+    }
 }

@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 config = "0.15.11"
+linkding-rs = "0.2.0"
