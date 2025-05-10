@@ -2,6 +2,10 @@ use config::Config;
 
 use linkding::{LinkDingClient, LinkDingError, ListBookmarksArgs};
 
+mod feed;
+
+use feed::Feed;
+
 struct AppConfig {
     api_key: String,
     url: String,
@@ -31,6 +35,15 @@ fn parse_config() -> AppConfig {
 fn main() {
     let cfg: AppConfig = parse_config();
 
+    let test_feed: Feed = Feed {
+        route: "temp".to_string(),
+        allowed_tags: Some(vec!["youtube".to_string(), "video".to_string()]),
+        blocked_tags: None,
+        unread: None,
+    };
+
+    println!("{}", test_feed.get_query_string());
+    /*
     let client: LinkDingClient = LinkDingClient::new(&cfg.url, &cfg.api_key);
 
     let args: ListBookmarksArgs = ListBookmarksArgs {
@@ -50,4 +63,5 @@ fn main() {
             println!("{}", e);
         }
     }
+    */
 }
