@@ -34,9 +34,10 @@ fn main() {
     let client: LinkDingClient = LinkDingClient::new(&cfg.url, &cfg.api_key);
 
     let args: ListBookmarksArgs = ListBookmarksArgs {
-        query: None,
+        query: Some("youtube".to_string()),
         limit: None,
         offset: None,
+        unread: None,
     };
 
     let response = client.list_bookmarks(args);

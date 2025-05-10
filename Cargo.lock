@@ -663,8 +663,6 @@ checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
 [[package]]
 name = "linkding-rs"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c7d9878a81ad6b22869d0e9a09f58991b31694b3180f0007f740b544ddc9f53"
 dependencies = [
  "http",
  "http-serde",
