@@ -27,17 +27,12 @@ fn main() {
 
     let config: AppConfig = toml::from_str(&config).unwrap();
 
-    println!("{:#?}", config);
-
     let client: LinkDingClient =
         LinkDingClient::new(&config.linkding_args.url, &config.linkding_args.api_key);
 
-    let args: ListBookmarksArgs = ListBookmarksArgs {
-        query: Some("youtube".to_string()),
-        limit: None,
-        offset: None,
-        unread: None,
-    };
+    let args: ListBookmarksArgs = config.feeds[0].clone().try_into().unwrap();
+
+    println!("{:#?}", args);
 
     let response = client.list_bookmarks(args);
 
