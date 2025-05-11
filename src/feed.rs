@@ -3,6 +3,8 @@ use std::convert::TryInto;
 use linkding::ListBookmarksArgs;
 use serde::Deserialize;
 
+use urlencoding::encode;
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Feed {
     pub route: String,
@@ -13,17 +15,25 @@ pub struct Feed {
 
 impl Feed {
     pub fn get_query_string(&self) -> Option<String> {
-        let tags: Vec<String> = self.allowed_tags.as_ref().unwrap().clone();
+        let Some(tags) = self.allowed_tags.as_ref() else {
+            return None;
+        };
 
-        //println!("{:#?}", self.allowed_tags.as_ref().unwrap());
+        let mut tags: Vec<String> = tags.clone();
+
+        // URL encode each tag
+        for i in 0..tags.len() {
+            tags[i] = encode(&tags[i]).to_string();
+        }
+
         return Some(tags.join("&"));
     }
 }
 
-impl TryInto<linkding::ListBookmarksArgs> for Feed {
+impl TryInto<ListBookmarksArgs> for Feed {
     type Error = ();
 
-    fn try_into(self) -> Result<linkding::ListBookmarksArgs, Self::Error> {
+    fn try_into(self) -> Result<ListBookmarksArgs, Self::Error> {
         return Ok(ListBookmarksArgs {
             query: self.get_query_string(),
             limit: None,
