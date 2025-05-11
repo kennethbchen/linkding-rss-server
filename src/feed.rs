@@ -1,3 +1,9 @@
+use std::convert::TryInto;
+
+use linkding::ListBookmarksArgs;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
 pub struct Feed {
     pub route: String,
     pub allowed_tags: Option<Vec<String>>,
@@ -7,8 +13,19 @@ pub struct Feed {
 
 impl Feed {
     pub fn get_query_string(&self) -> String {
-        let tags: String;
+        todo!();
+    }
+}
 
-        todo!("not yet implemented");
+impl TryInto<linkding::ListBookmarksArgs> for Feed {
+    type Error = ();
+
+    fn try_into(self) -> Result<linkding::ListBookmarksArgs, Self::Error> {
+        return Ok(ListBookmarksArgs {
+            query: None,
+            limit: None,
+            offset: None,
+            unread: self.unread,
+        });
     }
 }
