@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use linkding::ListBookmarksArgs;
+use linkding::{Bookmark, ListBookmarksArgs};
 use serde::Deserialize;
 
 use urlencoding::encode;
@@ -27,6 +27,42 @@ impl Feed {
         }
 
         return Some(tags.join("&"));
+    }
+
+    pub fn allows_bookmark(&self, bookmark: &Bookmark) -> bool {
+        // Check each tag if exists
+        match &self.allowed_tags {
+            Some(feed_tags) => {
+                for feed_tag in feed_tags {
+                    let mut found: bool = false;
+                    for tag in &bookmark.tag_names {
+                        if feed_tag == tag {
+                            found = true;
+                        }
+                    }
+
+                    if !found {
+                        return false;
+                    }
+                }
+            }
+            None => {}
+        }
+
+        match &self.blocked_tags {
+            Some(feed_tags) => {
+                for feed_tag in feed_tags {
+                    for tag in &bookmark.tag_names {
+                        if feed_tag == tag {
+                            return false;
+                        }
+                    }
+                }
+            }
+            None => {}
+        }
+
+        return true;
     }
 }
 

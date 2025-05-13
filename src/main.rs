@@ -1,4 +1,4 @@
-use linkding::{LinkDingClient, LinkDingError, ListBookmarksArgs};
+use linkding::{Bookmark, LinkDingClient, LinkDingError, ListBookmarksArgs, ListBookmarksResponse};
 
 mod feed;
 use feed::Feed;
@@ -19,6 +19,16 @@ struct AppConfig {
     linkding_args: LinkdingArgs,
     feeds: Vec<Feed>,
 }
+
+fn filter_bookmarks(response: ListBookmarksResponse, feed: &Feed) -> Vec<Bookmark> {
+    for item in response.results {
+        if !feed.allows_bookmark(&item) {
+            println!("{:#?}", item);
+        }
+    }
+    todo!();
+}
+
 fn main() {
     // Read file
     let Ok(config) = fs::read_to_string("config.toml") else {
@@ -30,18 +40,16 @@ fn main() {
     let client: LinkDingClient =
         LinkDingClient::new(&config.linkding_args.url, &config.linkding_args.api_key);
 
+    let feed = config.feeds[0].clone();
+
     let args: ListBookmarksArgs = config.feeds[0].clone().try_into().unwrap();
 
-    println!("{:#?}", args);
+    println!("{:#?}", feed);
+    let Ok(response) = client.list_bookmarks(args) else {
+        panic!();
+    };
 
-    let response = client.list_bookmarks(args);
+    //println!("{:#?}", response);
 
-    match response {
-        Ok(res) => {
-            println!("{}", res.count);
-        }
-        Err(e) => {
-            println!("{}", e);
-        }
-    }
+    filter_bookmarks(response, &feed);
 }
