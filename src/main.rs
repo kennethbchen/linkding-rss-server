@@ -21,12 +21,15 @@ struct AppConfig {
 }
 
 fn filter_bookmarks(response: ListBookmarksResponse, feed: &Feed) -> Vec<Bookmark> {
+    // TODO: handle response.next
+    let mut bookmarks: Vec<Bookmark> = Vec::new();
+
     for item in response.results {
-        if !feed.allows_bookmark(&item) {
-            println!("{:#?}", item);
+        if feed.allows_bookmark(&item) {
+            bookmarks.push(item);
         }
     }
-    todo!();
+    return bookmarks;
 }
 
 fn main() {
@@ -49,7 +52,7 @@ fn main() {
         panic!();
     };
 
-    //println!("{:#?}", response);
+    let bookmarks: Vec<Bookmark> = filter_bookmarks(response, &feed);
 
-    filter_bookmarks(response, &feed);
+    println!("{:#?}", bookmarks);
 }
