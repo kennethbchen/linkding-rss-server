@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 linkding-rs = { path = "local-crates/linkding-rs"}
+rss = "2.0.12"
 serde = "1.0.219"
 toml = "0.8.22"
 urlencoding = "2.1.3"

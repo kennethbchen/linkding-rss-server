@@ -3,10 +3,13 @@ use std::convert::TryInto;
 use linkding::{Bookmark, ListBookmarksArgs};
 use serde::Deserialize;
 
+use rss::Channel;
 use urlencoding::encode;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Feed {
+    pub title: String,
+    pub description: String,
     pub route: String,
     pub allowed_tags: Option<Vec<String>>,
     pub blocked_tags: Option<Vec<String>>,
@@ -76,5 +79,15 @@ impl TryInto<ListBookmarksArgs> for Feed {
             offset: None,
             unread: self.unread,
         });
+    }
+}
+
+impl TryInto<Channel> for Feed {
+    type Error = ();
+
+    fn try_into(self) -> Result<rss::Channel, Self::Error> {
+        let mut channel = Channel::default();
+
+        todo!();
     }
 }
