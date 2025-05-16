@@ -1,0 +1,27 @@
+[linkding_args]
+api_key = "key"
+url = "url"
+
+[[feeds]]
+title = "Unread Articles"
+description = "Unread articles from linkding"
+route = "articles"
+blocked_tags = ["youtube", "music", "game"]
+unread = true
+
+[[feeds]]
+title = "Unread Videos"
+description = "Unread videos from linkding"
+route = "videos"
+allowed_tags = ["#video"]
+blocked_tags = ["music"]
+unread = true
+
+[[feeds]]
+title = "Unread Music"
+description = "Unread music from linkding"
+route = "music"
+allowed_tags = ["#music"]
+unread = true
+
+
