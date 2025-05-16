@@ -3,6 +3,7 @@ use linkding::{Bookmark, LinkDingClient, LinkDingError, ListBookmarksArgs, ListB
 mod feed;
 use feed::Feed;
 
+use rss::{Channel, Item};
 use serde::Deserialize;
 
 use core::panic;
@@ -32,6 +33,23 @@ fn filter_bookmarks(response: ListBookmarksResponse, feed: &Feed) -> Vec<Bookmar
     return bookmarks;
 }
 
+fn bookmarks_to_items(bookmarks: Vec<Bookmark>) -> Vec<Item> {
+    let mut items: Vec<Item> = Vec::new();
+
+    for bookmark in bookmarks {
+        let mut item = Item::default();
+        item.set_title(bookmark.title);
+        item.set_link(bookmark.url);
+        item.set_description(bookmark.description);
+
+        item.set_pub_date(bookmark.date_added);
+
+        items.push(item);
+    }
+
+    return items;
+}
+
 fn main() {
     // Read file
     let Ok(config) = fs::read_to_string("config.toml") else {
@@ -47,12 +65,18 @@ fn main() {
 
     let args: ListBookmarksArgs = config.feeds[0].clone().try_into().unwrap();
 
-    println!("{:#?}", feed);
     let Ok(response) = client.list_bookmarks(args) else {
         panic!();
     };
 
     let bookmarks: Vec<Bookmark> = filter_bookmarks(response, &feed);
 
-    println!("{:#?}", bookmarks);
+    let bookmarks: Vec<Item> = bookmarks_to_items(bookmarks);
+
+    //println!("{:#?}", bookmarks);
+
+    let mut channel: Channel = config.feeds[0].clone().try_into().unwrap();
+    channel.set_items(bookmarks);
+
+    println!("{:#?}", channel.to_string());
 }

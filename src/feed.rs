@@ -33,11 +33,12 @@ impl Feed {
     }
 
     pub fn allows_bookmark(&self, bookmark: &Bookmark) -> bool {
-        // Check each tag if exists
+        // If this feed has allowed tags, check if they all exist in the bookmark
         match &self.allowed_tags {
             Some(feed_tags) => {
                 for feed_tag in feed_tags {
                     let mut found: bool = false;
+
                     for tag in &bookmark.tag_names {
                         if feed_tag == tag {
                             found = true;
@@ -87,7 +88,9 @@ impl TryInto<Channel> for Feed {
 
     fn try_into(self) -> Result<rss::Channel, Self::Error> {
         let mut channel = Channel::default();
+        channel.set_title(&self.title);
+        channel.set_description(&self.description);
 
-        todo!();
+        return Ok(channel);
     }
 }
