@@ -3,9 +3,9 @@ use linkding::LinkDingClient;
 use serde::Deserialize;
 
 use core::panic;
-use std::{fmt::Error, fs};
+use std::fs;
 
-use actix_web::{App, HttpResponse, HttpServer, Responder, ResponseError, Result, get, post, web};
+use actix_web::{App, HttpServer, get, web};
 
 mod feed;
 use feed::Feed;
