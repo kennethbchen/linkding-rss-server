@@ -21,6 +21,8 @@ struct AppConfig {
     feeds: Vec<Feed>,
 }
 
+struct FeedError;
+
 fn filter_bookmarks(response: ListBookmarksResponse, feed: &Feed) -> Vec<Bookmark> {
     // TODO: handle response.next
     let mut bookmarks: Vec<Bookmark> = Vec::new();
@@ -50,6 +52,22 @@ fn bookmarks_to_items(bookmarks: Vec<Bookmark>) -> Vec<Item> {
     return items;
 }
 
+fn build_channel(feed: &Feed, linkding: &LinkDingClient) -> Result<Channel, FeedError> {
+    let args: ListBookmarksArgs = feed.clone().try_into().unwrap();
+
+    let Ok(response) = linkding.list_bookmarks(args) else {
+        return Err(FeedError);
+    };
+
+    let items: Vec<Bookmark> = filter_bookmarks(response, feed);
+    let items: Vec<Item> = bookmarks_to_items(items);
+
+    let mut channel: Channel = feed.clone().try_into().unwrap();
+
+    channel.set_items(items);
+    return Ok(channel);
+}
+
 fn main() {
     // Read file
     let Ok(config) = fs::read_to_string("config.toml") else {
@@ -63,20 +81,9 @@ fn main() {
 
     let feed = config.feeds[0].clone();
 
-    let args: ListBookmarksArgs = config.feeds[0].clone().try_into().unwrap();
-
-    let Ok(response) = client.list_bookmarks(args) else {
-        panic!();
+    let Ok(channel) = build_channel(&feed, &client) else {
+        panic!("Feed error occured");
     };
-
-    let bookmarks: Vec<Bookmark> = filter_bookmarks(response, &feed);
-
-    let bookmarks: Vec<Item> = bookmarks_to_items(bookmarks);
-
-    //println!("{:#?}", bookmarks);
-
-    let mut channel: Channel = config.feeds[0].clone().try_into().unwrap();
-    channel.set_items(bookmarks);
 
     println!("{:#?}", channel.to_string());
 }
