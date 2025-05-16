@@ -33,6 +33,10 @@ impl Feed {
     }
 
     pub fn allows_bookmark(&self, bookmark: &Bookmark) -> bool {
+        /*
+        // Note: This is functionally unneeded because we already filter for allowed_tags
+        // when we query linkding
+
         // If this feed has allowed tags, check if they all exist in the bookmark
         match &self.allowed_tags {
             Some(feed_tags) => {
@@ -52,7 +56,7 @@ impl Feed {
             }
             None => {}
         }
-
+        */
         match &self.blocked_tags {
             Some(feed_tags) => {
                 for feed_tag in feed_tags {
