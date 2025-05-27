@@ -5,7 +5,9 @@ use serde::Deserialize;
 use core::{net, panic};
 use std::fs;
 
-use actix_web::{App, HttpServer, get, web};
+use actix_web::{
+    App, HttpResponse, HttpServer, get, http::StatusCode, http::header::ContentType, web,
+};
 
 mod feed;
 use feed::Feed;
@@ -38,17 +40,19 @@ struct AppState {
 }
 
 #[get("/{feed_route}")]
-async fn get_feed_rss(data: web::Data<AppState>, path: web::Path<String>) -> Option<String> {
+async fn get_feed_rss(data: web::Data<AppState>, path: web::Path<String>) -> HttpResponse {
     let feed_route: String = path.into_inner();
 
     let Some(feed) = &data.config.get_feed_from_route(&feed_route) else {
-        return None;
+        return HttpResponse::new(StatusCode::NOT_FOUND);
     };
 
     let Ok(channel) = build_channel(&feed, &data.linkding_client) else {
-        return None;
+        return HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR);
     };
-    return Some(channel.to_string());
+    return HttpResponse::Ok()
+        .content_type(ContentType::xml())
+        .body(channel.to_string());
 }
 
 #[actix_web::main]
