@@ -2,7 +2,7 @@ use linkding::LinkDingClient;
 
 use serde::Deserialize;
 
-use core::panic;
+use core::{net, panic};
 use std::fs;
 
 use actix_web::{App, HttpServer, get, web};
@@ -15,6 +15,8 @@ use linkding_bridge::{LinkdingArgs, build_channel};
 
 #[derive(Debug, Deserialize)]
 struct AppConfig {
+    ip: net::IpAddr,
+    port: u16,
     linkding_args: LinkdingArgs,
     feeds: Vec<Feed>,
 }
@@ -51,6 +53,12 @@ async fn get_feed_rss(data: web::Data<AppState>, path: web::Path<String>) -> Opt
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let Ok(config) = fs::read_to_string("config.toml") else {
+        panic!("config.toml could not be read");
+    };
+
+    let config: AppConfig = toml::from_str(&config).unwrap();
+
     println!("Starting server...");
     HttpServer::new(|| {
         // Read config file
@@ -70,7 +78,7 @@ async fn main() -> std::io::Result<()> {
             }))
             .service(get_feed_rss)
     })
-    .bind(("127.0.0.1", 10100))?
+    .bind((config.ip, config.port))?
     .run()
     .await
 }
